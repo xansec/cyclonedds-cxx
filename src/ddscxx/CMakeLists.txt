@@ -128,6 +128,10 @@ if(BUILD_TESTING)
   add_subdirectory(tests)
 endif()
 
+if(BUILD_FUZZING)
+  add_subdirectory(fuzz)
+endif()
+
 if(BUILD_DOCS)
   find_package(Doxygen REQUIRED)
 

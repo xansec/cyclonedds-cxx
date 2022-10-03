@@ -1,0 +1,5 @@
+project: cyclonedds-cxx
+target: fuzz-query
+
+cmds: 
+  - cmd: /fuzz-query
