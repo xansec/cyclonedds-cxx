@@ -48,6 +48,8 @@ namespace core
 namespace cond
 {
 
+DDSCXX_WARNING_MSVC_OFF(4251)
+
 class WaitSetDelegate;
 
 class OMG_DDS_API ConditionDelegate :
@@ -86,11 +88,25 @@ public:
 
     virtual void dispatch();
 
+    virtual void add_waitset(
+        const dds::core::cond::TCondition<ConditionDelegate> & cond,
+        org::eclipse::cyclonedds::core::cond::WaitSetDelegate *waitset);
+
+    virtual bool remove_waitset(
+        org::eclipse::cyclonedds::core::cond::WaitSetDelegate *waitset);
+
+    virtual void detach_from_waitset(const dds_entity_t entity_handle);
+    virtual void detach_and_close(const dds_entity_t entity_handle);
+
     dds::core::cond::TCondition<ConditionDelegate> wrapper();
 
 private:
+    std::set<WaitSetDelegate *> waitSetList;
+    org::eclipse::cyclonedds::core::Mutex waitSetListUpdateMutex;
     org::eclipse::cyclonedds::core::cond::FunctorHolderBase *myFunctor;
 };
+
+DDSCXX_WARNING_MSVC_ON(4251)
 
 }
 }

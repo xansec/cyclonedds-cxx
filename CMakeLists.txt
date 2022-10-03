@@ -9,8 +9,8 @@
 #
 # SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
 #
-cmake_minimum_required(VERSION 3.10)
-project(CycloneDDS-CXX VERSION 0.10.0 LANGUAGES C CXX)
+cmake_minimum_required(VERSION 3.16)
+project(CycloneDDS-CXX VERSION 0.11.0 LANGUAGES C CXX)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/Modules")
 
@@ -110,12 +110,6 @@ if(CMAKE_GENERATOR STREQUAL "Xcode")
   set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_ABOUT_MISSING_PROTOTYPES YES)
 endif()
 
-if(CMAKE_VERSION VERSION_LESS 3.13)
-  macro(add_link_options)
-    link_libraries(${ARGV})
-  endmacro()
-endif()
-
 if(CMAKE_CROSSCOMPILING)
   set(not_crosscompiling OFF)
 else()
@@ -124,7 +118,13 @@ endif()
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/Modules")
 
+option(BUILD_DDSLIB "Build DDS lib" ON)
+
 option(BUILD_IDLLIB "Build IDL preprocessor lib" ${not_crosscompiling})
+
+if(NOT BUILD_DDSLIB AND NOT BUILD_IDLLIB)
+  message(FATAL_ERROR "Nothing to build. At least one of the options BUILD_DDSLIB and/or BUILD_IDLLIB must be ON.")
+endif()
 
 # Make it easy to enable MSVC, Clang's/gcc's analyzers
 set(ANALYZER "" CACHE STRING "Analyzer to enable on the build.")
