@@ -172,8 +172,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
   dds::topic::Topic<Space::Type1> topic = dds::topic::Topic<Space::Type1>(participant, "query_fuzz_topic");;
   dds::sub::DataReader<Space::Type1> reader = dds::sub::DataReader<Space::Type1>(subscriber, topic);
   std::string expression = "long_1 = %0 and long_2 = %1 and long_3 = %2";
-  const char *paramsinit[] = {"1", "2", "3"};
-  std::vector<std::string> params = std::vector<std::string>(paramsinit, paramsinit+3);
+  const char *params_init[] = {"1", "2", "3"};
+  std::vector<std::string> params = std::vector<std::string>(params_init, params_init+3);
   dds::sub::Query query(reader, expression);
 
   // Prep fuzz data
@@ -192,10 +192,15 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     case 1:
     {
       std::vector<std::string> new_params;
-      //There is a much better way to do this but I am stupid and don't understand fuzzing vectors of strings
-      new_params.push_back(provider.ConsumeRandomLengthString(size));
-      new_params.push_back(provider.ConsumeRandomLengthString(size));
-      new_params.push_back(provider.ConsumeRandomLengthString(size));
+      size_t size_tracker = size;
+      std::string fuzzed_str;
+      while(size_tracker >= 0) {
+        //string_size = rand() % (size - 1) + 1;
+        fuzzed_str = provider.ConsumeRandomLengthString(size);
+        new_params.push_back(fuzzed_str);
+        size_tracker -= fuzzed_str.size();
+        //current_size -= string_size;
+      }
       query.parameters(new_params.begin(), new_params.end());
       break;
     }
